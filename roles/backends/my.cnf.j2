@@ -1,6 +1,7 @@
 [mysqld]
 #mysql settings
 server-id= {{ server_id }}
+max_connect_errors = 100000
 binlog_format=ROW
 default-storage-engine=innodb
 innodb_autoinc_lock_mode=2

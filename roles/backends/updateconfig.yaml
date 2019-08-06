@@ -1,0 +1,44 @@
+---
+- hosts: backends
+  serial: 1
+  tasks:
+  - name: copy dns
+    copy:
+      src: /home/tokugero/repos/digitalocean/roles/backends/hosts.debian.tmpl
+      dest: /etc/cloud/templates/hosts.debian.tmpl
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: copy my.cnf template
+    template:
+      src: /home/tokugero/repos/digitalocean/roles/backends/my.cnf.j2
+      dest: /etc/mysql/my.cnf
+
+  - name: copy telegraf config
+    template:
+      src: /home/tokugero/repos/digitalocean/roles/backends/telegraf.conf.j2
+      dest: /etc/telegraf/telegraf.conf
+
+  - name: reload telegraf
+    systemd:
+      name: telegraf
+      state: reloaded
+
+  - name: stop mysql
+    systemd:
+      name: mariadb
+      state: stopped
+
+  - name: start mysql
+    systemd:
+      name: mariadb
+      state: started
+      
+  - name: waiting to give node a chance to recover
+    pause:
+      seconds: 30
+
+  - name: validate state
+    shell: mysql -u root -e "SHOW STATUS LIKE 'wsrep_cluster_%'"
+

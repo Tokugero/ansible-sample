@@ -35,6 +35,10 @@
             - mariadb-server-10.1
             - rsync
 
+  - name: add haproxy users with defaults
+    command: >
+            mysql -e "insert into mysql.user (Host,User) values ('%','haproxy_check'); grant all privileges on *.* to 'haproxy_root'@'%' identified by 'haproxy_root' with grant option; flush privileges"
+
   - name: Telegraf apt-get update_cache
     apt:
             update_cache: yes
@@ -44,12 +48,9 @@
             name: telegraf
             state: present
   - name: Update telegraf config
-    copy:
-            src: /home/tokugero/repos/digitalocean/roles/backends/telegraf.conf
+    template:
+            src: /home/tokugero/repos/digitalocean/roles/backends/telegraf.conf.j2
             dest: /etc/telegraf/telegraf.conf
-            owner: root
-            group: root
-            mode: 0644
 
   - name: Restart telegraf
     systemd:

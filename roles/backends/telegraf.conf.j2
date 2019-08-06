@@ -32,3 +32,5 @@ hosttype="backend"
 [[inputs.system]]
 [[inputs.net]]
 [[inputs.mysql]]
+  metric_version = 2
+  servers = ["haproxy_root:haproxy_root@tcp({{ inventory_hostname }}:3306)/"]

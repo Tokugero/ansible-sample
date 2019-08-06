@@ -1,0 +1,35 @@
+---
+- hosts: frontends 
+  tasks:
+  - name: ensure python3 is available
+    apt:
+            name: "{{ dependencies }}"
+    vars:
+            dependencies:
+            - psmisc
+            - python3
+            - python3-pip
+
+  - name: get py packages for flask app
+    pip:
+            name: "{{ packages }}"
+            executable: pip3
+    vars:
+            packages:
+            - flask
+            - mysql-connector-python
+
+  - name: copy over sample flask app
+    copy:
+            src: /home/tokugero/repos/digitalocean/roles/frontends/app.py
+            dest: /usr/local/bin/app.py
+            owner: root
+            group: root
+            mode: "0777"
+
+  - name: kill flask
+    shell: killall python3 
+    ignore_errors: yes
+
+  - name: start python app in background, not installing as service!
+    shell: export FLASK_APP=/usr/local/bin/app.py; nohup python3 -m flask run --host=0.0.0.0 &

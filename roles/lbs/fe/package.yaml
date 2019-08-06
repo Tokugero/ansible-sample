@@ -1,0 +1,20 @@
+---
+- hosts: fe 
+  tasks:
+  - name: apt-get update
+    apt:
+            update_cache: yes
+
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: copy haproxy config template
+    template:
+            src: /home/tokugero/repos/digitalocean/roles/lbs/fe/haproxy.cfg.j2
+            dest: /etc/haproxy/haproxy.cfg
+
+  - name: reload haproxy
+    systemd:
+            name: haproxy
+            state: reloaded
