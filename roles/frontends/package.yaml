@@ -1,0 +1,66 @@
+---
+- hosts: frontends 
+  tasks:
+  - name: apt-get update
+    apt:
+            update_cache: yes
+
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: dirmngr
+    apt:
+            name: dirmngr
+            state: present
+
+  - name: gnupg
+    apt: 
+            name: gnupg
+            state: present
+
+  - name: add msft key
+    shell: wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg; mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+
+  - name: get msft lists
+    shell: wget -q https://packages.microsoft.com/config/debian/9/prod.list; mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+
+  - name: clean permissions
+    shell: chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg; chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+
+  - name: apt-get update for msft
+    apt:
+            update_cache: yes
+
+  - name: get .net packages
+    apt:
+            name: "{{ packages}} "
+    vars:
+            packages:
+            - dotnet-runtime-2.0.6
+            - aspnetcore-store-2.0.6
+            - libv8-3.14.5
+            - libv8-dev
+
+  - name: Telegraf apt-get update_cache
+    apt:
+            update_cache: yes
+
+  - name: Telegraf apt-get install telegraf
+    apt:
+            name: telegraf
+            state: present
+
+  - name: Update telegraf config
+    copy:
+            src: /home/tokugero/repos/digitalocean/roles/frontends/telegraf.conf
+            dest: /etc/telegraf/telegraf.conf
+            owner: root
+            group: root
+            mode: 0644
+
+  - name: Restart telegraf
+    systemd:
+            name: telegraf
+            state: restarted
+

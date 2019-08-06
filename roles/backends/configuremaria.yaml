@@ -1,0 +1,16 @@
+---
+- hosts: backends
+  tasks:
+
+  - name: copy dns
+    copy:
+      src: /home/tokugero/repos/digitalocean/roles/backends/hosts.debian.tmpl
+      dest: /etc/cloud/templates/hosts.debian.tmpl 
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: copy my.cnf template 
+    template:
+      src: /home/tokugero/repos/digitalocean/roles/backends/my.cnf.j2
+      dest: /etc/mysql/my.cnf

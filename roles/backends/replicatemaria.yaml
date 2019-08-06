@@ -1,0 +1,25 @@
+---
+- hosts: backends
+  tasks:
+  - name: reboot server
+    reboot:
+
+  - name: stop mysql
+    systemd:
+      name: mariadb
+      state: stopped
+
+  - name: bootstrap master
+    shell: galera_new_cluster
+    when: server_id == 1 
+
+  - name: waiting to give master a chance to spawn
+    pause:
+
+  - name: start mysql
+    systemd:
+      name: mariadb
+      state: started
+      
+  - name: validate state
+    shell: mysql -u root -e "SHOW STATUS LIKE 'wsrep_cluster_%'"

@@ -1,0 +1,51 @@
+---
+- hosts: grafana 
+  tasks:
+
+  - name: apt-get udpate
+    apt:
+            update_cache: yes
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: install grafana keys
+    shell: curl -sL https://packages.grafana.com/gpg.key | sudo apt-key add -
+
+  - name: add grafana repo
+    apt_repository: 
+            repo: deb https://packages.grafana.com/oss/deb stable main
+            state: present
+
+  - name: install grafana
+    apt:
+            name: grafana
+            state: present
+
+  - name: enable grafana
+    systemd:
+            name: grafana-server
+            state: started
+            enabled: yes
+
+  - name: Telegraf apt-get update_cache
+    apt:
+            update_cache: yes
+
+  - name: Telegraf apt-get install telegraf
+    apt:
+            name: telegraf
+            state: present
+  - name: Update telegraf config
+    copy:
+            src: /home/tokugero/repos/digitalocean/roles/all/telegraf.conf
+            dest: /etc/telegraf/telegraf.conf
+            owner: root
+            group: root
+            mode: 0644
+
+  - name: Restart telegraf
+    systemd:
+            name: telegraf
+            state: restarted
+

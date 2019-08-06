@@ -1,0 +1,32 @@
+all:
+  vars:
+    user: root
+    key_file: /home/tokugero/.ssh/digitalocean
+  children:
+    backends:
+      hosts:
+        165.22.162.117: 
+          server_id: 3
+        134.209.13.4: 
+          server_id: 2 
+        165.22.153.146: 
+          server_id: 1
+    frontends:
+      hosts:
+        165.22.136.60:
+        165.22.175.223:
+        165.22.173.229:
+    influx: 
+      hosts:
+        165.22.216.82:
+    grafana:
+      hosts:
+        165.22.153.100:
+    lbs:
+      children:
+        fe:
+          hosts:
+            165.22.128.121:
+        be:
+          hosts:
+            165.22.131.188:

@@ -1,0 +1,73 @@
+---
+- hosts: all 
+  tasks:
+
+  - name: apt-get update
+    apt:
+            update_cache: yes
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: Install apt-transport-https
+    apt:
+            name: apt-transport-https
+            state: present
+  - name: Install screen
+    apt:
+            name: screen
+            state: present
+  - name: Install vim
+    apt:
+            name: vim
+            state: present
+  - name: Install ntp
+    apt:
+            name: ntp
+            state: present
+  - name: Install net-tools
+    apt:
+            name: net-tools
+            state: present
+  - name: Install pip
+    apt:
+            name: python-pip
+            state: present
+  - name: Install git
+    apt:
+            name: git
+            state: present
+  - name: Install curl
+    apt:
+            name: curl
+            state: present
+
+  - name: telegraf (influx) key
+    shell: wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+
+  - name: add influxdb source
+    shell: . /etc/os-release; test $VERSION_ID = "9" && echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+
+  - name: apt-get update
+    apt:
+            upgrade: yes
+  - name: Telegraf apt-get update_cache
+    apt:
+            update_cache: yes
+
+  - name: Telegraf apt-get install telegraf
+    apt:
+            name: telegraf
+            state: present
+
+  - name: Enable telegraf start
+    systemd:
+            name: telegraf
+            enabled: yes
+            masked: no
+
+  - name: Restart telegraf
+    systemd:
+            name: telegraf
+            state: restarted
+

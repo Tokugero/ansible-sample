@@ -1,0 +1,49 @@
+---
+- hosts: influx 
+  tasks:
+  - name: add influx repo
+    shell: wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+  
+  - name: add influx verison to repo
+    shell: . /etc/os-release; test $VERSION_ID = "9" && echo "deb https://repos.influxdata.com/debian stretch stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+
+  - name: apt-get udpate
+    apt:
+            update_cache: yes
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: install influxdb
+    apt:
+            name: influxdb
+            state: present
+
+  - name: start influx
+    systemd:
+            name: influxdb
+            enabled: yes
+            masked: no
+            state: started
+
+  - name: Telegraf apt-get update_cache
+    apt:
+            update_cache: yes
+
+  - name: Telegraf apt-get install telegraf
+    apt:
+            name: telegraf
+            state: present
+  - name: Update telegraf config
+    copy:
+            src: /home/tokugero/repos/digitalocean/roles/influx/telegraf.conf
+            dest: /etc/telegraf/telegraf.conf
+            owner: root
+            group: root
+            mode: 0644
+
+  - name: Restart telegraf
+    systemd:
+            name: telegraf
+            state: restarted
+

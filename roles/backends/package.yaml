@@ -1,0 +1,58 @@
+---
+- hosts: backends 
+  tasks:
+  - name: apt-get udpate
+    apt:
+            update_cache: yes
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: install dependencies
+    apt:
+            name: "{{ packages }}" 
+    vars:
+            packages:
+            - software-properties-common
+            - dirmngr
+
+  - name: get keys
+    shell: apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xF1656F24C74CD1D8
+
+  - name: add maria official repo
+    apt_repository:
+            repo: deb [arch=amd64,i386,ppc64el] http://mirrors.syringanetworks.net/mariadb/repo/10.4/debian stretch main
+
+  - name: update again
+    apt:
+            update_cache: yes
+ 
+  - name: install mariadb-server
+    apt:
+            name: "{{ packages_mysql }}"
+    vars:
+            packages_mysql:
+            - mariadb-server-10.1
+            - rsync
+
+  - name: Telegraf apt-get update_cache
+    apt:
+            update_cache: yes
+
+  - name: Telegraf apt-get install telegraf
+    apt:
+            name: telegraf
+            state: present
+  - name: Update telegraf config
+    copy:
+            src: /home/tokugero/repos/digitalocean/roles/backends/telegraf.conf
+            dest: /etc/telegraf/telegraf.conf
+            owner: root
+            group: root
+            mode: 0644
+
+  - name: Restart telegraf
+    systemd:
+            name: telegraf
+            state: restarted
+

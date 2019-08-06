@@ -1,0 +1,16 @@
+[mysqld]
+#mysql settings
+server-id= {{ server_id }}
+binlog_format=ROW
+default-storage-engine=innodb
+innodb_autoinc_lock_mode=2
+bind-address={{ inventory_hostname }}
+
+#galera settings
+wsrep_on=ON
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+wsrep_cluster_name="my_wsrep_cluster_improved"
+wsrep_cluster_address="gcomm://{{ groups['backends']|join(',') }}"
+wsrep_node_address="{{ inventory_hostname }}"
+wsrep_node_name="mysql{{ server_id }}"
+wsrep_sst_method=rsync
