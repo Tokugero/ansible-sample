@@ -1,5 +1,6 @@
 ---
 - hosts: frontends 
+  serial: 1
   tasks:
   - name: ensure python3 is available
     apt:

@@ -15,10 +15,10 @@ def callsql(result):
     cursor.close()
     cnx.close()
 
-def unreasonablecalls():
+def unreasonablecalls(calls):
     threads = []
     output = []
-    for i in range(500):
+    for i in range(calls):
         functionThread = threading.Thread(target=callsql, args=(output,))
         threads.append(functionThread)
     for t in threads:
@@ -28,9 +28,12 @@ def unreasonablecalls():
     return output
 
 @app.route('/')
-def hello_world():
-    queryResult = unreasonablecalls()
+def get_rekt_sql():
+    calls = 1000
+    queryResult = unreasonablecalls(calls)
     response = ""
     for i in queryResult:
         response += i+"<br>"
+
+    response = str(len(queryResult))+" calls were successfully made out of "+str(calls)+"<br>"+response
     return response
