@@ -1,0 +1,4 @@
+server.port: 5601
+server.host: "{{ inventory_hostname }}"
+elasticsearch.hosts: ["http://{{ inventory_hostname }}:9200"]
+xpack.security.enabled: false

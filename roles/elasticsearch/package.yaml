@@ -1,0 +1,77 @@
+---
+- hosts: elasticsearch 
+  tasks:
+
+  - name: apt-get udpate
+    apt:
+            update_cache: yes
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: install elasticsearch keys
+    shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+  - name: add elasticsearch repo
+    apt_repository: 
+            repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+            state: present
+
+  - name: install elasticsearch/kibana
+    apt:
+            name: "{{ packages }}"
+            state: present
+    vars:
+            packages:
+            - kibana
+            - elasticsearch
+
+  - name: copy elasticsearch config
+    template:
+            src: /home/tokugero/repos/digitalocean/roles/elasticsearch/elasticsearch.yml.j2
+            dest: /etc/elasticsearch/elasticsearch.yml
+            owner: root
+            group: root
+            mode: 0744
+
+  - name: copy kibana config
+    template:
+            src: /home/tokugero/repos/digitalocean/roles/elasticsearch/kibana.yml.j2
+            dest: /etc/kibana/kibana.yml
+            owner: root
+            group: root
+            mode: 0744
+
+  - name: enable kibana 
+    systemd:
+            name: kibana
+            state: restarted
+            enabled: yes
+
+  - name: enable elasticsearch
+    systemd:
+            name: elasticsearch
+            state: restarted
+            enabled: yes
+
+  - name: Telegraf apt-get update_cache
+    apt:
+            update_cache: yes
+
+  - name: Telegraf apt-get install telegraf
+    apt:
+            name: telegraf
+            state: present
+  - name: Update telegraf config
+    copy:
+            src: /home/tokugero/repos/digitalocean/roles/elasticsearch/telegraf.conf
+            dest: /etc/telegraf/telegraf.conf
+            owner: root
+            group: root
+            mode: 0644
+
+  - name: Restart telegraf
+    systemd:
+            name: telegraf
+            state: restarted
+

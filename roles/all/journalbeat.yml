@@ -1,0 +1,15 @@
+journalbeat.inputs:
+- paths: []
+  seek: cursor
+
+setup.template.settings:
+  index.number_of_shards: 1
+
+setup.kibana:
+
+output.elasticsearch:
+  hosts: ["167.71.151.216:9200"]
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~

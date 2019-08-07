@@ -1,0 +1,7 @@
+cluster.initial_master_nodes: elasticsearch
+xpack.security.enabled: false
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+network.host: {{ inventory_hostname }}
+http.port: 9200
+

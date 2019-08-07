@@ -1,0 +1,50 @@
+---
+- hosts: all 
+  tasks:
+
+  - name: Add /etc/default/logstash
+    file:
+            path: /etc/default/logstash
+            state: directory
+
+  - name: apt-get update
+    apt:
+            update_cache: yes
+  - name: apt-get upgrade
+    apt:
+            upgrade: yes
+
+  - name: elasticsearch key
+    shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+  - name: apt-get update
+    apt:
+            upgrade: yes
+
+  - name: add elasticsearch repo
+    apt_repository:
+            repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+            state: present
+
+  - name: install logstash
+    apt:
+            name: logstash
+            state: present
+
+  - name: install journalbeat
+    apt:
+            name: journalbeat
+            state: present
+
+  - name: copy journalbeat config
+    copy:
+            src: /home/tokugero/repos/digitalocean/roles/all/journalbeat.yml
+            dest: /etc/journalbeat/journalbeat.yml
+            owner: root
+            group: root
+            mode: 0744
+
+  - name: restart journalbeat for new config
+    systemd:
+            name: journalbeat
+            state: restarted
